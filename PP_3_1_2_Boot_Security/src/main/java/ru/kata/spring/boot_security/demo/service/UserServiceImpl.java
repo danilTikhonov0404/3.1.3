@@ -2,53 +2,68 @@ package ru.kata.spring.boot_security.demo.service;
 
 
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kata.spring.boot_security.demo.dao.RoleDao;
-import ru.kata.spring.boot_security.demo.dao.UserDao;
-import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
+import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 
 @Service
 public class UserServiceImpl implements UserService{
 
-    private final UserDao userDAO;
-    public UserServiceImpl( UserDao userDAO){
-        this.userDAO = userDAO;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public List<User> getAllUsers() {
-        return userDAO.getAllUsers();
+        return userRepository.findAll();
     }
 
     @Transactional
     @Override
     public void saveUser(User user) {
-        userDAO.saveUser(user);
+        userRepository.save(user);
     }
 
     @Transactional
     @Override
     public void deleteUser(Long id) {
-        userDAO.deleteUser(id);
+       if (userRepository.findById(id).isPresent()){
+           userRepository.deleteById(id);
+       }
     }
 
     @Override
     public User getUserById(Long id) {
-        return userDAO.getUserById(id);
+        return userRepository.getById(id);
     }
 
     @Transactional
     @Override
-    public void updateUser(Long id, User updatedUser) {
-        userDAO.updateUser(id, updatedUser);
+    public void updateUser(Long id, User user) {
+       User updatedUser = userRepository.findById(id).get();
+       if (user.getPassword().isEmpty()){
+           user.setPassword(updatedUser.getPassword());
+       }else {
+           user.setPassword(passwordEncoder.encode(user.getPassword()));
+       }
+       userRepository.save(user);
     }
 
 
+
+
+    public UserRepository getUserRepository() {
+        return userRepository;
+    }
 }

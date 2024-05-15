@@ -1,12 +1,15 @@
 package ru.kata.spring.boot_security.demo.model;
 
+
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
+
 
 
 @Entity
@@ -27,17 +30,17 @@ public class User implements UserDetails {
     @Column
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
-
+            inverseJoinColumns = @JoinColumn(name = "roles_id"))
+    @Fetch(FetchMode.JOIN)
+    private List<Role> roles;
     public User() {
     }
 
-    public User(String name, String surname, int age,String password,Set<Role> roles) {
+    public User(String name, String surname, int age,String password,List<Role> roles) {
         this.name = name;
         this.surname = surname;
         this.age = age;
@@ -47,7 +50,7 @@ public class User implements UserDetails {
     public void setPassword (String password) {
         this.password = password;
     }
-    public String getPasswordd(){return password;}
+
     public Long getId() {
         return id;
     }
@@ -116,11 +119,11 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    public Set<Role> getRoles() {
+    public List<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(List<Role> roles) {
         this.roles = roles;
     }
     @Override

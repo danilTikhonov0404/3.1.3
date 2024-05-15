@@ -13,9 +13,7 @@ public class Role implements GrantedAuthority {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     private String roleName;
-    @Transient
-    @ManyToMany(mappedBy = "roles")
-    private List<User> users;
+
 
     public Role() {
     }
@@ -39,44 +37,36 @@ public class Role implements GrantedAuthority {
         return roleName;
     }
 
-    public void setRoleName(String rolename) {
-        this.roleName = rolename;
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
-    public List<User> getUsers() {
-        return users;
-    }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
 
     @Override
     public String getAuthority() {
         return roleName;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public Role(long id, String roleName) {
+        this.id = id;
+        this.roleName = roleName;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Role)) return false;
         Role role = (Role) o;
-        return id == role.id && Objects.equals(roleName, role.roleName) && Objects.equals(users, role.users);
+        return getId() == role.getId() && Objects.equals(getRoleName(), role.getRoleName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, roleName, users);
+        return Objects.hash(getId(), getRoleName());
     }
-
-    @Override
-    public String toString() {
-        return "Role{" +
-                "id=" + id +
-                ", rolename='" + roleName + '\'' +
-                ", users=" + users +
-                '}';
-    }
-
-
 }
