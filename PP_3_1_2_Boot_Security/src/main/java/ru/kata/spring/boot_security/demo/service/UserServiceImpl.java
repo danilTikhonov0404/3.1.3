@@ -13,6 +13,8 @@ import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
+
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -31,7 +33,7 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public void saveUser(User user) {
+    public void updateUser (Long id, User user) {
         userRepository.save(user);
     }
 
@@ -50,14 +52,9 @@ public class UserServiceImpl implements UserService{
 
     @Transactional
     @Override
-    public void updateUser(Long id, User user) {
-       User updatedUser = userRepository.findById(id).get();
-       if (user.getPassword().isEmpty()){
-           user.setPassword(updatedUser.getPassword());
-       }else {
-           user.setPassword(passwordEncoder.encode(user.getPassword()));
-       }
-       userRepository.save(user);
+    public void saveUser( User user) {
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    userRepository.save(user);
     }
 
 
